@@ -14,7 +14,7 @@ public class GameManager : MonoBehaviour
     public TMPro.TextMeshProUGUI gameOverText;
 
 
-    static bool restartMode = false;
+    static bool restartMode = true;
     public bool gameOver = true;
     // Start is called before the first frame update
     

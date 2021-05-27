@@ -6,6 +6,7 @@ public class MarioPlayer : MonoBehaviour
 {
     public static MarioPlayer Instance;
     public float jumpSpeed = 20;
+    bool faceRight = true;
     int jumpCount = 1;
 
     KeyCode MOVE_LEFT = KeyCode.LeftArrow;
@@ -33,13 +34,17 @@ public class MarioPlayer : MonoBehaviour
 
         if(Input.GetKey(MOVE_LEFT)) {
             rigidBody2D.velocity = new Vector2(-5, rigidBody2D.velocity.y);
+            faceRight = false;
         }
         if(Input.GetKey(MOVE_RIGHT)) {
             rigidBody2D.velocity = new Vector2(5, rigidBody2D.velocity.y);
+            faceRight = true;
         }
         if(!Input.GetKey(MOVE_LEFT) && !Input.GetKey(MOVE_RIGHT)) {
             rigidBody2D.velocity = new Vector2(0, rigidBody2D.velocity.y);
         }       
+
+        GetComponent<SpriteRenderer>().flipX = !faceRight;
     }
 
     void OnCollisionEnter2D (Collision2D hit)
