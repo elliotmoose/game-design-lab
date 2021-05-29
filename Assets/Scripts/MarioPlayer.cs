@@ -12,10 +12,13 @@ public class MarioPlayer : MonoBehaviour
     KeyCode MOVE_LEFT = KeyCode.LeftArrow;
     KeyCode MOVE_RIGHT = KeyCode.RightArrow;
     KeyCode JUMP = KeyCode.Space;
+
+    Animator animator;
     // Start is called before the first frame update
     void Start()
     {
         Instance = this;
+        animator = GetComponent<Animator>();
     }
 
     // Update is called once per frame
@@ -29,19 +32,23 @@ public class MarioPlayer : MonoBehaviour
             if(jumpCount == 1) {
                 rigidBody2D.velocity = new Vector2(rigidBody2D.velocity.x, jumpSpeed);
                 jumpCount = 0;
+                animator.SetBool("IsJumping", true);
             }
         }
 
         if(Input.GetKey(MOVE_LEFT)) {
             rigidBody2D.velocity = new Vector2(-5, rigidBody2D.velocity.y);
             faceRight = false;
+            animator.SetBool("IsRunning", true);
         }
         if(Input.GetKey(MOVE_RIGHT)) {
             rigidBody2D.velocity = new Vector2(5, rigidBody2D.velocity.y);
             faceRight = true;
+            animator.SetBool("IsRunning", true);
         }
         if(!Input.GetKey(MOVE_LEFT) && !Input.GetKey(MOVE_RIGHT)) {
             rigidBody2D.velocity = new Vector2(0, rigidBody2D.velocity.y);
+            animator.SetBool("IsRunning", false);
         }       
 
         GetComponent<SpriteRenderer>().flipX = !faceRight;
@@ -52,6 +59,7 @@ public class MarioPlayer : MonoBehaviour
         if(hit.gameObject.name == "Floor")
         {
             jumpCount = 1;
+            animator.SetBool("IsJumping", false);
         }
 
         if(hit.gameObject.CompareTag("Enemy")) {
