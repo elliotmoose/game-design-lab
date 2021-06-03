@@ -7,6 +7,8 @@ TagManager:
   - Enemy
   - FxTemporaire
   - End
+  - Ground
+  - Tube
   layers:
   - Default
   - TransparentFX
@@ -14,9 +16,9 @@ TagManager:
   - 
   - Water
   - UI
-  - 
-  - 
-  - 
+  - QuestionBox
+  - Obstacles
+  - Spawned
   - 
   - 
   - 
@@ -41,6 +43,9 @@ TagManager:
   - 
   - 
   m_SortingLayers:
+  - name: Background
+    uniqueID: 3672010355
+    locked: 0
   - name: Default
     uniqueID: 0
     locked: 0

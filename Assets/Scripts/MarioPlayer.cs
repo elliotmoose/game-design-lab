@@ -5,7 +5,7 @@ using UnityEngine;
 public class MarioPlayer : MonoBehaviour
 {
     public static MarioPlayer Instance;
-    public float jumpSpeed = 20;
+    public float jumpSpeed = 30;
     bool faceRight = true;
     int jumpCount = 1;
 
@@ -14,49 +14,72 @@ public class MarioPlayer : MonoBehaviour
     KeyCode JUMP = KeyCode.Space;
 
     Animator animator;
+    AudioSource audioSource;
+    Rigidbody2D rigidBody;
     // Start is called before the first frame update
     void Start()
     {
         Instance = this;
         animator = GetComponent<Animator>();
+        rigidBody = GetComponent<Rigidbody2D>();
+        audioSource = GetComponent<AudioSource>();
     }
 
     // Update is called once per frame
     void Update()
     {
         if(GameManager.Instance.gameOver) {return;}
-        Rigidbody2D rigidBody2D = GetComponent<Rigidbody2D>();
         if(Input.GetKeyDown(JUMP)) {
             Debug.Log(jumpCount);
 
             if(jumpCount == 1) {
-                rigidBody2D.velocity = new Vector2(rigidBody2D.velocity.x, jumpSpeed);
+                rigidBody.velocity = new Vector2(rigidBody.velocity.x, jumpSpeed);
                 jumpCount = 0;
                 animator.SetBool("IsJumping", true);
             }
+        }        
+    
+        if(Input.GetKey(MOVE_LEFT)) {
+            if(faceRight && Mathf.Abs(rigidBody.velocity.x) > 0.5 && jumpCount == 1) {
+                animator.SetTrigger("OnSkid");
+            }
+
+            // rigidBody.velocity = new Vector2(-5, rigidBody.velocity.y);
+            faceRight = false;
         }
 
-        if(Input.GetKey(MOVE_LEFT)) {
-            rigidBody2D.velocity = new Vector2(-5, rigidBody2D.velocity.y);
-            faceRight = false;
-            animator.SetBool("IsRunning", true);
-        }
         if(Input.GetKey(MOVE_RIGHT)) {
-            rigidBody2D.velocity = new Vector2(5, rigidBody2D.velocity.y);
+            if(!faceRight && Mathf.Abs(rigidBody.velocity.x) > 0.5 && jumpCount == 1) {
+                animator.SetTrigger("OnSkid");
+            }
+            // rigidBody.velocity = new Vector2(5, rigidBody.velocity.y);
             faceRight = true;
-            animator.SetBool("IsRunning", true);
         }
         if(!Input.GetKey(MOVE_LEFT) && !Input.GetKey(MOVE_RIGHT)) {
-            rigidBody2D.velocity = new Vector2(0, rigidBody2D.velocity.y);
-            animator.SetBool("IsRunning", false);
+            rigidBody.velocity = new Vector2(0, rigidBody.velocity.y);
         }       
 
+        animator.SetFloat("xSpeed", Mathf.Abs(rigidBody.velocity.x));
         GetComponent<SpriteRenderer>().flipX = !faceRight;
+    }
+
+    void FixedUpdate() {
+        if(GameManager.Instance.gameOver) {return;}
+        float speed = 200;
+        float maxSpeed = 5;
+        float moveHor = Input.GetAxis("Horizontal");
+        
+        if(Mathf.Abs(moveHor) > 0) {
+            bool isSameDirection = (Mathf.Sign(rigidBody.velocity.x) == Mathf.Sign(moveHor));
+            if(!isSameDirection || rigidBody.velocity.magnitude < maxSpeed) {
+                rigidBody.AddForce(new Vector2(moveHor, 0) * speed);
+            }
+        }
     }
 
     void OnCollisionEnter2D (Collision2D hit)
     {
-        if(hit.gameObject.name == "Floor")
+        if((hit.gameObject.CompareTag("Ground") || hit.gameObject.CompareTag("Tube")) && Mathf.Abs(rigidBody.velocity.y) < 0.01f )
         {
             jumpCount = 1;
             animator.SetBool("IsJumping", false);
@@ -78,5 +101,9 @@ public class MarioPlayer : MonoBehaviour
         if(hit.gameObject.CompareTag("End")) {
             GameManager.Instance.Win();
         }
+    }
+
+    public void PlayJumpSound() {        
+        audioSource.PlayOneShot(audioSource.clip);
     }
 }
