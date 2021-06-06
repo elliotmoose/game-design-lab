@@ -39,6 +39,7 @@ public class Mushroom : MonoBehaviour
             this.stop = true;
         }
     }
+    
 
     void OnBecameInvisible() {
         GameObject.Destroy(gameObject);
