@@ -79,10 +79,11 @@ public class MarioPlayer : MonoBehaviour
 
     void OnCollisionEnter2D (Collision2D hit)
     {
-        if((hit.gameObject.CompareTag("Ground") || hit.gameObject.CompareTag("Tube")) && Mathf.Abs(rigidBody.velocity.y) < 0.01f )
+        if((hit.gameObject.CompareTag("Ground") || hit.gameObject.CompareTag("Tube")) && Mathf.Abs(rigidBody.velocity.y) < 0.01f  && jumpCount != 1)
         {
             jumpCount = 1;
             animator.SetBool("IsJumping", false);
+            transform.Find("dustCloud").GetComponent<ParticleSystem>().Play();
         }
 
         if(hit.gameObject.CompareTag("Enemy")) {
