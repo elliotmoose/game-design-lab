@@ -5,13 +5,19 @@ using UnityEngine;
 public class MarioPlayer : MonoBehaviour
 {
     public static MarioPlayer Instance;
+    public Constant gameConstants;
     public float jumpSpeed = 30;
+    public float maxSpeed = 5;
     bool faceRight = true;
     int jumpCount = 1;
 
     KeyCode MOVE_LEFT = KeyCode.LeftArrow;
     KeyCode MOVE_RIGHT = KeyCode.RightArrow;
     KeyCode JUMP = KeyCode.Space;
+
+    public List<Consumable> consumables = new List<Consumable>(); 
+    KeyCode ORANGE_MUSH = KeyCode.Z;
+    KeyCode RED_MUSH = KeyCode.X;
 
     Animator animator;
     AudioSource audioSource;
@@ -23,6 +29,13 @@ public class MarioPlayer : MonoBehaviour
         animator = GetComponent<Animator>();
         rigidBody = GetComponent<Rigidbody2D>();
         audioSource = GetComponent<AudioSource>();
+        GameManager.OnPlayerKilled += AnimateDeath;
+        jumpSpeed = gameConstants.playerJumpSpeed;
+        maxSpeed = gameConstants.playerMaxSpeed;
+    }
+
+    void OnDestroy() {
+        GameManager.OnPlayerKilled -= AnimateDeath;
     }
 
     // Update is called once per frame
@@ -59,6 +72,14 @@ public class MarioPlayer : MonoBehaviour
             rigidBody.velocity = new Vector2(0, rigidBody.velocity.y);
         }       
 
+        if(Input.GetKey(ORANGE_MUSH)) {
+            PowerupManager.Instance.Cast(0, this.gameObject);
+        }
+        
+        if(Input.GetKey(RED_MUSH)) {
+            PowerupManager.Instance.Cast(1, this.gameObject);
+        }
+
         animator.SetFloat("xSpeed", Mathf.Abs(rigidBody.velocity.x));
         GetComponent<SpriteRenderer>().flipX = !faceRight;
     }
@@ -66,7 +87,7 @@ public class MarioPlayer : MonoBehaviour
     void FixedUpdate() {
         if(GameManager.Instance.gameOver) {return;}
         float speed = 200;
-        float maxSpeed = 5;
+        
         float moveHor = Input.GetAxis("Horizontal");
         
         if(Mathf.Abs(moveHor) > 0) {
@@ -86,19 +107,6 @@ public class MarioPlayer : MonoBehaviour
             transform.Find("dustCloud").GetComponent<ParticleSystem>().Play();
         }
 
-        if(hit.gameObject.CompareTag("Enemy")) {
-            Vector3 enemyPosition = hit.gameObject.transform.position;
-            float horThreshold = 1;
-            float vertThreshold = 0.5f;
-            if(enemyPosition.x - transform.position.x < horThreshold && (transform.position.y-enemyPosition.y) > vertThreshold) {
-                GameObject.Destroy(hit.gameObject);
-                GameManager.Instance.score += 1;
-            }
-            else {
-                GameManager.Instance.GameOver();
-            }
-        }
-
         if(hit.gameObject.CompareTag("End")) {
             GameManager.Instance.Win();
         }
@@ -106,5 +114,10 @@ public class MarioPlayer : MonoBehaviour
 
     public void PlayJumpSound() {        
         audioSource.PlayOneShot(audioSource.clip);
+    }
+
+    void AnimateDeath() {
+        transform.GetChild(0).gameObject.SetActive(true);
+        GetComponent<SpriteRenderer>().enabled = false;
     }
 }

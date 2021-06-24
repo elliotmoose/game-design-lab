@@ -2,10 +2,10 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Mushroom : MonoBehaviour
+public abstract class Mushroom : MonoBehaviour, Consumable
 {
     bool isRight = true; 
-    bool stop = false;
+    bool collided = false;
     float speed = 5;
     Rigidbody2D rigidBody;
     // Start is called before the first frame update
@@ -18,7 +18,7 @@ public class Mushroom : MonoBehaviour
     
     void FixedUpdate()
     {
-        if(stop) {
+        if(collided) {
             rigidBody.velocity = Vector2.zero;
         }
         else {
@@ -36,12 +36,32 @@ public class Mushroom : MonoBehaviour
         }
 
         if(col.gameObject.CompareTag("Player")) {
-            this.stop = true;
+            this.collided = true;            
+            StartCoroutine(CollectedAnimation());
+            this.GetComponent<BoxCollider2D>().enabled = false;
+            GetComponent<Rigidbody2D>().gravityScale = 0;
+            this.OnCollected();
         }
     }
     
+    public abstract void ConsumedBy(GameObject player);
+    public abstract void OnCollected();
+
+    IEnumerator CollectedAnimation(){
+
+        SpriteRenderer renderer = this.GetComponent<SpriteRenderer>();
+        Color color = renderer.color;
+        int steps = 10;
+        for(int i=0; i<steps; i++) {
+            this.transform.localScale += Vector3.one * 4/(float)steps;
+            renderer.color = new Color(color.r, color.g, color.b, 255*(1-i/(float)steps));
+            yield return new WaitForEndOfFrame();
+        }
+
+        renderer.enabled = false;
+    }
 
     void OnBecameInvisible() {
-        GameObject.Destroy(gameObject);
+        // GameObject.Destroy(gameObject);
     }
 }

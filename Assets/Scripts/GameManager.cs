@@ -1,9 +1,12 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Audio;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 using TMPro;
+
+public delegate void GameEvent();
 public class GameManager : MonoBehaviour
 {
     public static GameManager Instance;
@@ -12,6 +15,12 @@ public class GameManager : MonoBehaviour
     public GameObject gameOverScreen;
     public GameObject scoreText;
     public TMPro.TextMeshProUGUI gameOverText;
+
+    public static event GameEvent OnPlayerKilled;
+    public static event GameEvent OnEnemyKilled;
+    public static event GameEvent OnIncreaseScore;
+
+    public AudioMixer audioMixer;
 
 
     static bool restartMode = true;
@@ -55,12 +64,22 @@ public class GameManager : MonoBehaviour
         gameOver = true;
         gameOverScreen.SetActive(true);   
         gameOverText.text = "GAME OVER\nYOU LOSTED"; 
+        if(OnPlayerKilled != null) OnPlayerKilled();
     }
 
     public void Win() {
         gameOver = true;
         gameOverScreen.SetActive(true);    
         gameOverText.text = "YOU WIN"; 
+    }
+
+    public void EnemyKilled() {
+        if(GameManager.OnEnemyKilled!=null) GameManager.OnEnemyKilled.Invoke();
+    }
+    
+    public void IncreaseScore() {
+        score += 1;
+        if(GameManager.OnIncreaseScore!=null) GameManager.OnIncreaseScore.Invoke();
     }
 
 }

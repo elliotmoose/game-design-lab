@@ -231,3 +231,4 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   debrisPrefab: {fileID: 4821596993359074177, guid: dfe6e7a776c31480192ddef9e007eef5, type: 3}
+  audioObjectPrefab: {fileID: 1163471478727059158, guid: ecf97f71f244149bfa197c296488d248, type: 3}
