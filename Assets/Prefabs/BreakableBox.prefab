@@ -232,3 +232,18 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   debrisPrefab: {fileID: 4821596993359074177, guid: dfe6e7a776c31480192ddef9e007eef5, type: 3}
   audioObjectPrefab: {fileID: 1163471478727059158, guid: ecf97f71f244149bfa197c296488d248, type: 3}
+  onBrickBreak:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 11400000, guid: f5dd4a5cb48b34df39c17b022d38a1af, type: 2}
+        m_TargetAssemblyTypeName: GameScriptableEvent, Assembly-CSharp
+        m_MethodName: Raise
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2

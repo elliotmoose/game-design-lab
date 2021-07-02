@@ -12,4 +12,9 @@ public class Constant : ScriptableObject
     public float playerMaxSpeed = 5;
     
     public float enemyMoveSpeed = 5;
+
+     // Mario basic starting values
+    public int playerStartingMaxSpeed = 5;
+    public int playerMaxJumpSpeed = 30;
+    public int playerDefaultForce = 150;
 }

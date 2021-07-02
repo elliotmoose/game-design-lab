@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Events;
 
 public enum EnemyState {
     Idle,
@@ -25,8 +26,9 @@ public class Gomba : MonoBehaviour
     bool exploded = false;
     bool alive = true;
 
-
     bool grounded = true;
+
+    public UnityEvent onEnemyDeath;
 
     void Start()
     {
@@ -102,8 +104,9 @@ public class Gomba : MonoBehaviour
 
                     if(explodeTimer < (-1*main.duration/4)) {
                         // GameObject.Destroy(this.gameObject);
+                        Debug.Log("explodeTimer");
                         this.gameObject.SetActive(false);
-                        GameManager.Instance.EnemyKilled();
+                        onEnemyDeath.Invoke();
                     }
                 }
                 break;
@@ -117,7 +120,7 @@ public class Gomba : MonoBehaviour
     }
 
     void FixedUpdate() {
-        if(GameManager.Instance.gameOver) {return;}
+        if(GameManager.Instance.IsGameOver()) {return;}
 
         if(this.state == EnemyState.Idle) {
             this.GetComponent<Rigidbody2D>().MovePosition(this.transform.position + new Vector3(isMovingLeft ? -1 : 1,0,0) * Time.fixedDeltaTime * speed);
@@ -152,8 +155,7 @@ public class Gomba : MonoBehaviour
 		// enemy dies		
         alive = false;
 		StartCoroutine(flatten());
-        GameManager.Instance.EnemyKilled();
-        GameManager.Instance.IncreaseScore();
+        onEnemyDeath.Invoke();
 	}
 
     IEnumerator flatten(){

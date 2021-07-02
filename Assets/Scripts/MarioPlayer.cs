@@ -6,8 +6,11 @@ public class MarioPlayer : MonoBehaviour
 {
     public static MarioPlayer Instance;
     public Constant gameConstants;
-    public float jumpSpeed = 30;
-    public float maxSpeed = 5;
+
+    public IntVariable jumpSpeed;
+    public IntVariable moveSpeed;
+    // public float jumpSpeed = 30;
+    // public float maxSpeed = 5;
     bool faceRight = true;
     int jumpCount = 1;
 
@@ -16,12 +19,15 @@ public class MarioPlayer : MonoBehaviour
     KeyCode JUMP = KeyCode.Space;
 
     public List<Consumable> consumables = new List<Consumable>(); 
-    KeyCode ORANGE_MUSH = KeyCode.Z;
-    KeyCode RED_MUSH = KeyCode.X;
+    public CustomCastEvent consumeMushroomEvent;
+    public static KeyCode ORANGE_MUSH = KeyCode.Z;
+    public static KeyCode RED_MUSH = KeyCode.X;
 
     Animator animator;
     AudioSource audioSource;
     Rigidbody2D rigidBody;
+
+
     // Start is called before the first frame update
     void Start()
     {
@@ -30,8 +36,10 @@ public class MarioPlayer : MonoBehaviour
         rigidBody = GetComponent<Rigidbody2D>();
         audioSource = GetComponent<AudioSource>();
         GameManager.OnPlayerKilled += AnimateDeath;
-        jumpSpeed = gameConstants.playerJumpSpeed;
-        maxSpeed = gameConstants.playerMaxSpeed;
+        jumpSpeed.SetValue((int)gameConstants.playerJumpSpeed);
+        moveSpeed.SetValue((int)gameConstants.playerMaxSpeed);
+        // jumpSpeed = gameConstants.playerJumpSpeed;
+        // maxSpeed = gameConstants.playerMaxSpeed;
     }
 
     void OnDestroy() {
@@ -41,12 +49,10 @@ public class MarioPlayer : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if(GameManager.Instance.gameOver) {return;}
+        if(GameManager.Instance.IsGameOver()) {return;}
         if(Input.GetKeyDown(JUMP)) {
-            Debug.Log(jumpCount);
-
             if(jumpCount == 1) {
-                rigidBody.velocity = new Vector2(rigidBody.velocity.x, jumpSpeed);
+                rigidBody.velocity = new Vector2(rigidBody.velocity.x, (float)jumpSpeed.Value);
                 jumpCount = 0;
                 animator.SetBool("IsJumping", true);
             }
@@ -73,11 +79,11 @@ public class MarioPlayer : MonoBehaviour
         }       
 
         if(Input.GetKey(ORANGE_MUSH)) {
-            PowerupManager.Instance.Cast(0, this.gameObject);
+            consumeMushroomEvent.Invoke(ORANGE_MUSH);
         }
         
         if(Input.GetKey(RED_MUSH)) {
-            PowerupManager.Instance.Cast(1, this.gameObject);
+            consumeMushroomEvent.Invoke(RED_MUSH);
         }
 
         animator.SetFloat("xSpeed", Mathf.Abs(rigidBody.velocity.x));
@@ -85,14 +91,14 @@ public class MarioPlayer : MonoBehaviour
     }
 
     void FixedUpdate() {
-        if(GameManager.Instance.gameOver) {return;}
+        if(GameManager.Instance.IsGameOver()) {return;}
         float speed = 200;
         
         float moveHor = Input.GetAxis("Horizontal");
         
         if(Mathf.Abs(moveHor) > 0) {
             bool isSameDirection = (Mathf.Sign(rigidBody.velocity.x) == Mathf.Sign(moveHor));
-            if(!isSameDirection || rigidBody.velocity.magnitude < maxSpeed) {
+            if(!isSameDirection || rigidBody.velocity.magnitude < (float)moveSpeed.Value) {
                 rigidBody.AddForce(new Vector2(moveHor, 0) * speed);
             }
         }

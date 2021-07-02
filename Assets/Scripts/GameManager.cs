@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Audio;
+using UnityEngine.Events;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 using TMPro;
@@ -9,60 +10,80 @@ using TMPro;
 public delegate void GameEvent();
 public class GameManager : MonoBehaviour
 {
-    public static GameManager Instance;
-    public int score;
+    private static GameManager _instance;
+    public static GameManager Instance {
+        get {
+            return _instance;
+        }
+    }
+    
     public GameObject startScreen;
     public GameObject gameOverScreen;
-    public GameObject scoreText;
     public TMPro.TextMeshProUGUI gameOverText;
 
     public static event GameEvent OnPlayerKilled;
-    public static event GameEvent OnEnemyKilled;
-    public static event GameEvent OnIncreaseScore;
 
     public AudioMixer audioMixer;
+    public UnityEvent onGameReset;
 
 
-    static bool restartMode = true;
-    public bool gameOver = true;
+    static bool firstGame = true;
+    bool gameOver = false;
+
+    public bool IsGameOver() {
+        return gameOver;
+    }
     // Start is called before the first frame update
     
     void Awake() {
-        Instance = this;
+        if(_instance != null) {
+            Destroy(this.gameObject);
+            return;
+        }
+
+        _instance = this;
+        // DontDestroyOnLoad(this.gameObject);
     }
 
     void Start()
     {        
-        // DontDestroyOnLoad(this.gameObject);
-        if(restartMode) {
-            StartGame();
+        if(firstGame) {
+            firstGame = false;
+            // ResetGame();
+            onGameReset.Invoke();
         }
-        restartMode = true;
+    //     // DontDestroyOnLoad(this.gameObject);
+    //     if(restartMode) {
+    //         StartGame();
+    //     }
+    //     restartMode = true;
     }
 
     // Update is called once per frame
     void Update()
     {
-        scoreText.GetComponent<TMPro.TextMeshProUGUI>().text = $"score: {score}";
+        
     }
 
-    public void StartGame() {
-        Debug.Log($"started with {restartMode}");
-        startScreen.SetActive(false);
-        gameOver = false;
-    }
-    
+    // public void StartGame() {
+    //     startScreen.SetActive(false);
+    //     //reset score
+    //     onGameStart.Invoke();
+    // }
+
     public void ResetGame() {
+        gameOver = false;
         gameOverScreen.SetActive(false);
         startScreen.SetActive(false);
-        SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+        SceneManager.LoadScene(SceneManager.GetActiveScene().name);        
+        onGameReset.Invoke();
         // GameObject[] gameObjects = SceneManager.GetActiveScene().GetRootGameObjects();
         // StartGame();
     }
 
     public void GameOver() {
         gameOver = true;
-        gameOverScreen.SetActive(true);   
+        gameOverScreen.SetActive(true);
         gameOverText.text = "GAME OVER\nYOU LOSTED"; 
         if(OnPlayerKilled != null) OnPlayerKilled();
     }
@@ -72,14 +93,4 @@ public class GameManager : MonoBehaviour
         gameOverScreen.SetActive(true);    
         gameOverText.text = "YOU WIN"; 
     }
-
-    public void EnemyKilled() {
-        if(GameManager.OnEnemyKilled!=null) GameManager.OnEnemyKilled.Invoke();
-    }
-    
-    public void IncreaseScore() {
-        score += 1;
-        if(GameManager.OnIncreaseScore!=null) GameManager.OnIncreaseScore.Invoke();
-    }
-
 }

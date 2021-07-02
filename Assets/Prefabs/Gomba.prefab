@@ -70838,6 +70838,21 @@ MonoBehaviour:
   explosionParticle: {fileID: 4648886980713689964}
   gameConstants: {fileID: 11400000, guid: 549294d00f4db4cd3ab104718bf9fd75, type: 2}
   speed: 3
+  onEnemyDeath:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 11400000, guid: 3cbe2b353d7254afca30e07b36fcb042, type: 2}
+        m_TargetAssemblyTypeName: GameScriptableEvent, Assembly-CSharp
+        m_MethodName: Raise
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!70 &4775488637737911121
 CapsuleCollider2D:
   m_ObjectHideFlags: 0

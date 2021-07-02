@@ -6,6 +6,7 @@ public class SpawnManager : MonoBehaviour
 {
     public Constant gameConstants;
     float groundDistance = -2.0f;
+
     public void SpawnNewEnemy() {
         SpawnFromPooler(Mathf.RoundToInt(Random.Range(0, 2)) == 0 ? ObjectPoolType.gombaEnemy : ObjectPoolType.greenEnemy);
     }
@@ -24,26 +25,18 @@ public class SpawnManager : MonoBehaviour
         }
     }
 
+    void Start() {
+        StartSpawn();
+    }
     public void StartSpawn() {
         for(int i=0; i<2; i++)
             SpawnFromPooler(ObjectPoolType.gombaEnemy);
-    }
-
-    // Start is called before the first frame update
-    void Start()
-    {
-        StartSpawn();
-        GameManager.OnIncreaseScore += SpawnNewEnemy;
     }
 
     // Update is called once per frame
     void Update()
     {
         
-    }
-
-    void OnDestroy() {
-        GameManager.OnIncreaseScore -= SpawnNewEnemy;
     }
 }
 

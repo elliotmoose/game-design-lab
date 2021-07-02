@@ -1,11 +1,14 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Events;
 
 public class BreakableBrick : MonoBehaviour
 {
     public GameObject debrisPrefab;
     public GameObject audioObjectPrefab;
+
+    public UnityEvent onBrickBreak;
     // Start is called before the first frame update
     void Start()
     {
@@ -26,8 +29,7 @@ public class BreakableBrick : MonoBehaviour
             }
 
             Instantiate(audioObjectPrefab, transform.position, Quaternion.identity).GetComponent<AudioObject>().Play();
-            
-            GameManager.Instance.IncreaseScore();
+            onBrickBreak.Invoke();
             GameObject.Destroy(this.transform.parent.gameObject);
     	}
     }

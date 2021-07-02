@@ -8,6 +8,10 @@ public abstract class Mushroom : MonoBehaviour, Consumable
     bool collided = false;
     float speed = 5;
     Rigidbody2D rigidBody;
+
+    public Powerup stats;
+    public CustomPowerupEvent onCollected;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -41,6 +45,7 @@ public abstract class Mushroom : MonoBehaviour, Consumable
             this.GetComponent<BoxCollider2D>().enabled = false;
             GetComponent<Rigidbody2D>().gravityScale = 0;
             this.OnCollected();
+            onCollected.Invoke(stats);
         }
     }
     
